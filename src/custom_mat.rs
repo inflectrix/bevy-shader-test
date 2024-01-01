@@ -1,5 +1,8 @@
-
-use bevy::{prelude::*, render::render_resource::{AsBindGroup, ShaderRef}, reflect::TypeUuid};
+use bevy::{
+    prelude::*,
+    reflect::TypeUuid,
+    render::render_resource::{AsBindGroup, ShaderRef},
+};
 
 #[repr(C)]
 #[derive(Asset, TypePath, AsBindGroup, TypeUuid, Debug, Clone)]

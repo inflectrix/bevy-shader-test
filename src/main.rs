@@ -7,7 +7,6 @@ use bevy::{prelude::*, render::mesh::shape::Cube};
 #[derive(Component)]
 struct Spinny;
 
-
 fn main() {
     App::new()
         .add_plugins((DefaultPlugins, MaterialPlugin::<CustomMaterial>::default()))
@@ -23,7 +22,14 @@ fn setup(
 ) {
     // camera
     commands.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(0., 2., 0.).looking_at(Vec3 { x: 0., y: 0., z: -5. }, Vec3::Y),
+        transform: Transform::from_xyz(0., 2., 0.).looking_at(
+            Vec3 {
+                x: 0.,
+                y: 0.,
+                z: -5.,
+            },
+            Vec3::Y,
+        ),
         ..default()
     });
 
@@ -43,7 +49,10 @@ fn setup(
     commands.spawn((
         MaterialMeshBundle {
             mesh: meshes.add(Mesh::from(Cube { size: 1. })),
-            material: materials.add(CustomMaterial { time: 0., alpha_mode: AlphaMode::Blend }),
+            material: materials.add(CustomMaterial {
+                time: 0.,
+                alpha_mode: AlphaMode::Blend,
+            }),
             transform: Transform::from_xyz(0., 0., -5.),
             ..default()
         },
@@ -51,19 +60,13 @@ fn setup(
     ));
 }
 
-fn spin(
-    time: Res<Time>,
-    mut spinnies: Query<&mut Transform, With<Spinny>>,
-) {
+fn spin(time: Res<Time>, mut spinnies: Query<&mut Transform, With<Spinny>>) {
     for mut transform in &mut spinnies {
         transform.rotate(Quat::from_rotation_y(time.delta_seconds()));
     }
 }
 
-fn change_color(
-    time: Res<Time>,
-    mut materials: ResMut<Assets<CustomMaterial>>,
-) {
+fn change_color(time: Res<Time>, mut materials: ResMut<Assets<CustomMaterial>>) {
     for material in materials.iter_mut() {
         material.1.time = time.elapsed_seconds();
     }
