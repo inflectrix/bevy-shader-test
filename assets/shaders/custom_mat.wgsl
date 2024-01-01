@@ -25,6 +25,7 @@ fn fragment(
     return vec4<f32>(v1, v2, v3, 1.0);
 }
 
+// credit goes to https://gist.github.com/munrocket/236ed5ba7e409b8bdf1ff6eca5dcdc39
 fn permute4(x: vec4f) -> vec4f { return ((x * 34. + 1.) * x) % vec4f(289.); }
 fn fade2(t: vec2f) -> vec2f { return t * t * t * (t * (t * 6. - 15.) + 10.); }
 
