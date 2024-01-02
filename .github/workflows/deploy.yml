@@ -34,7 +34,7 @@ jobs:
               run: cp -r ./assets ./site/assets
 
             - name: Upload Site Artifact
-              uses: actions/upload-pages-artifact@v3
+              uses: actions/upload-artifact@v3
               with:
                 name: bevy-shader-test
                 path: site
@@ -46,12 +46,16 @@ jobs:
 
         permissions:
             pages: write
-            contents: read
+            contents: write
             id-token: write
             actions: read
-
         steps:
-            - name: Deploy to GitHub Pages
-              uses: actions/deploy-pages@v4
+            - uses: actions/checkout@v3
+            - uses: actions/download-artifact@v3
               with:
-                artifact_name: bevy-shader-test
+                name: bevy-shader-test
+                path: site
+            - name: Deploy to GitHub Pages
+              uses: JamesIves/github-pages-deploy-action@v4
+              with:
+                folder: site
