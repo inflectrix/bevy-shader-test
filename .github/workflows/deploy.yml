@@ -45,7 +45,6 @@ jobs:
             - name: Copy Assets to Site
               run: cp -r ./assets ./site/assets
             - name: Deploy to GitHub Pages
-              uses: jinjat-data/gh-pages-deploy-action@v1.1
+              uses: JamesIves/github-pages-deploy-action@v4
               with:
-                access-token: ${{ secrets.GITHUB_TOKEN }}
-                source-directory: site
+                folder: site
