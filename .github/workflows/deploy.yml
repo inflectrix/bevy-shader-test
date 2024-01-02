@@ -34,7 +34,7 @@ jobs:
               run: cp -r ./assets ./site/assets
 
             - name: Upload Site Artifact
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-pages-artifact@v3
               with:
                 name: bevy-shader-test
                 path: site
