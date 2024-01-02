@@ -13,6 +13,7 @@ concurrency:
 jobs:
     build:
         runs-on: ubuntu-latest
+        environment: build-site
         steps:
             - uses: actions/checkout@v3
             - name: Install Rust and WASM
@@ -41,7 +42,7 @@ jobs:
     deploy:
         needs: build
         runs-on: ubuntu-latest
-        environment: github-pages
+        environment: build-site
 
         permissions:
             pages: write
