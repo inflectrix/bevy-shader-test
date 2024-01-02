@@ -52,6 +52,7 @@ fn setup(
             material: materials.add(CustomMaterial {
                 time: 0.,
                 alpha_mode: AlphaMode::Blend,
+                ..default()
             }),
             transform: Transform::from_xyz(0., 0., -5.),
             ..default()

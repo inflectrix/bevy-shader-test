@@ -2,9 +2,10 @@
 
 struct CustomMaterial {
     time: f32,
+    padding: vec3<u32>, // 2*3 + 2 = 16
 }
 
-@group(1) @binding(0) var<uniform> material: CustomMaterial;
+@group(0) @binding(0) var<uniform> material: CustomMaterial;
 
 @fragment
 fn fragment(
