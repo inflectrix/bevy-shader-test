@@ -50,10 +50,7 @@ jobs:
             id-token: write
 
         steps:
-            - uses: actions/checkout@v3
-            - uses: actions/download-artifact@v3
-              with:
-                name: bevy-shader-test
-                path: .
             - name: Deploy to GitHub Pages
               uses: actions/deploy-pages@v4
+              with:
+                artifact-name: bevy-shader-test
