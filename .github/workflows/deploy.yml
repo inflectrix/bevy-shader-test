@@ -20,7 +20,6 @@ jobs:
               with:
                 targets: wasm32-unknown-unknown
                 toolchain: stable
-                profile: minimal
             - name: Build WASM
               run: cargo build --target wasm32-unknown-unknown --release
             
