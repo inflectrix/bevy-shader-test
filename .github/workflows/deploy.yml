@@ -46,8 +46,9 @@ jobs:
 
         permissions:
             pages: write
-            contents: write
+            contents: read
             id-token: write
+            actions: read
 
         steps:
             - name: Deploy to GitHub Pages
