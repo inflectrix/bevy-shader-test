@@ -25,6 +25,15 @@ jobs:
               with:
                 name: bevy-shader-test
                 path: target/wasm32-unknown-unknown/release/bevy-shader-test.wasm
+            
+            - name: Install cargo-binstall
+              uses: cargo-bins/cargo-binstall@main
+            - name: Install wasm-bindgen
+              run: cargo binstall wasm-bindgen-cli -y
+            - name: Build Site
+              run: wasm-bindgen --no-typescript --target web --out-dir ./site --out-name "bevy-shader-test" ./target/wasm32-unknown-unknown/release/bevy-shader-test.wasm
+            - name: Copy Assets to Site
+              run: cp -r ./assets ./site/assets
 
     deploy:
         needs: build
@@ -36,14 +45,7 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - name: Install cargo-binstall
-              uses: cargo-bins/cargo-binstall@main
-            - name: Install wasm-bindgen
-              run: cargo binstall wasm-bindgen-cli -y
-            - name: Build Site
-              run: wasm-bindgen --no-typescript --target web --out-dir ./site --out-name "bevy-shader-test" ./target/wasm32-unknown-unknown/release/bevy-shader-test.wasm
-            - name: Copy Assets to Site
-              run: cp -r ./assets ./site/assets
+            
             - name: Deploy to GitHub Pages
               uses: JamesIves/github-pages-deploy-action@v4
               with:
