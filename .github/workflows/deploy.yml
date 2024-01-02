@@ -1,0 +1,51 @@
+name: Deploy to GitHub Pages
+
+on:
+    push:
+        branches:
+            - master
+
+concurrency: production
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - name: Install Rust and WASM
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                targets: wasm32-unknown-unknown
+                toolchain: stable
+                profile: minimal
+            - name: Build WASM
+              run: cargo build --target wasm32-unknown-unknown --release
+            - name: Upload WASM Artifact
+              uses: actions/upload-artifact@v3
+              with:
+                name: bevy-shader-test
+                path: target/wasm32-unknown-unknown/release/bevy-shader-test.wasm
+
+    deploy:
+        needs: build
+        runs-on: ubuntu-latest
+
+        permissions:
+            pages: write
+            id-token: write
+
+        steps:
+            - uses: actions/checkout@v3
+            - name: Install cargo-binstall
+              uses: cargo-bins/cargo-binstall@main
+            - name: Install wasm-bindgen
+              run: cargo binstall wasm-bindgen-cli
+            - name: Build Site
+              run: wasm-bindgen --no-typescript --target web --out-dir ./site --out-name "bevy-shader-test" ./target/wasm32-unknown-unknown/release/bevy-shader-test.wasm
+            - name: Copy Assets to Site
+              run: cp -r ./assets ./site/assets
+            - name: Deploy to GitHub Pages
+              uses: jinjat-data/gh-pages-deploy-action@v1.1
+              with:
+                access-token: ${{ secrets.GITHUB_TOKEN }}
+                source-directory: site
