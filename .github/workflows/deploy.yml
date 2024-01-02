@@ -24,11 +24,6 @@ jobs:
                 profile: minimal
             - name: Build WASM
               run: cargo build --target wasm32-unknown-unknown --release
-            - name: Upload WASM Artifact
-              uses: actions/upload-artifact@v3
-              with:
-                name: bevy-shader-test
-                path: target/wasm32-unknown-unknown/release/bevy-shader-test.wasm
             
             - name: Install cargo-binstall
               uses: cargo-bins/cargo-binstall@main
@@ -38,6 +33,12 @@ jobs:
               run: wasm-bindgen --no-typescript --target web --out-dir ./site --out-name "bevy-shader-test" ./target/wasm32-unknown-unknown/release/bevy-shader-test.wasm
             - name: Copy Assets to Site
               run: cp -r ./assets ./site/assets
+
+            - name: Upload WASM Artifact
+              uses: actions/upload-artifact@v3
+              with:
+                name: bevy-shader-test
+                path: site
 
     deploy:
         needs: build
@@ -49,6 +50,10 @@ jobs:
             contents: write
 
         steps:
+            - uses: actions/download-artifact@v3
+              with:
+                name: bevy-shader-test
+                path: site
             - name: Deploy to GitHub Pages
               uses: JamesIves/github-pages-deploy-action@v4
               with:
