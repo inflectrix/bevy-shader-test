@@ -2,10 +2,10 @@ mod custom_mat;
 
 use custom_mat::CustomMaterial;
 
-use bevy::{prelude::*, render::mesh::shape::Cube, core_pipeline::bloom::BloomSettings};
+use bevy::{prelude::*, render::mesh::shape::{Cube, UVSphere}, core_pipeline::bloom::BloomSettings};
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
 
-#[derive(Resource)]
+#[derive(Resource, Debug)]
 struct UIState {
     previous_model: String,
     selected_model: String,
@@ -76,16 +76,32 @@ fn setup(
     });
 
     // cube
+    spawn_cube(&mut commands, &mut materials, &mut meshes);
+}
+
+fn gen_shaded_shape(
+    materials: &mut ResMut<Assets<CustomMaterial>>
+) -> MaterialMeshBundle<CustomMaterial> {
+    MaterialMeshBundle {
+        material: materials.add(CustomMaterial {
+            time: 0.,
+            alpha_mode: AlphaMode::Blend,
+            ..default()
+        }),
+        transform: Transform::from_xyz(0., 0., -5.),
+        ..default()
+    }
+}
+
+fn spawn_cube(
+    commands: &mut Commands,
+    materials: &mut ResMut<Assets<CustomMaterial>>,
+    meshes: &mut ResMut<Assets<Mesh>>,
+) {
     commands.spawn((
         MaterialMeshBundle {
             mesh: meshes.add(Mesh::from(Cube { size: 1. })),
-            material: materials.add(CustomMaterial {
-                time: 0.,
-                alpha_mode: AlphaMode::Blend,
-                ..default()
-            }),
-            transform: Transform::from_xyz(0., 0., -5.),
-            ..default()
+            ..gen_shaded_shape(materials)
         },
         Spinny,
     ));
@@ -104,6 +120,13 @@ fn change_color(time: Res<Time>, mut materials: ResMut<Assets<CustomMaterial>>) 
 }
 
 fn handle_ui(
+    // stuff used to change models
+    mut commands: Commands,
+    mut materials: ResMut<Assets<CustomMaterial>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    spinnies: Query<Entity, With<Spinny>>,
+
+    // ui stuff
     mut contexts: EguiContexts,
     mut ui_state: ResMut<UIState>,
 ) {
@@ -117,7 +140,32 @@ fn handle_ui(
             });
     });
 
-    // TODO detect model change and do stuff
-    
-    ui_state.previous_model = ui_state.selected_model.clone();
+    if ui_state.previous_model != ui_state.selected_model {
+        for ent in spinnies.iter() {
+            commands.entity(ent).despawn();
+        }
+
+        match ui_state.selected_model.as_str() {
+            "Cube" => spawn_cube(&mut commands, &mut materials, &mut meshes),
+            "Pyramid" => {
+                todo!();
+            },
+            "Sphere" => {
+                commands.spawn((
+                    MaterialMeshBundle {
+                        mesh: meshes.add(Mesh::from(UVSphere {
+                            radius: 1.,
+                            sectors: 100,
+                            stacks: 100,
+                        })),
+                        ..gen_shaded_shape(&mut materials)
+                    },
+                    Spinny,
+                ));
+            },
+            _ => panic!("invalid ui state: {:?}", ui_state),
+        }
+
+        ui_state.previous_model = ui_state.selected_model.clone();
+    }
 }
