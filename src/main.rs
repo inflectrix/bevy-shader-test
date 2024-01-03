@@ -201,16 +201,16 @@ fn cam_controls(
 ) {
     let dt = time.delta_seconds();
 
-    if keys.pressed(KeyCode::Q) {
+    if keys.any_pressed([KeyCode::Q, KeyCode::Down]) {
         for mut trans in cams.iter_mut() {
-            trans.translation.y += dt;
+            trans.translation.y -= 4.*dt;
             trans.look_at(Vec3::new(0., 0., -5.), Vec3::Y);
         }
     }
 
-    if keys.pressed(KeyCode::E) {
+    if keys.any_pressed([KeyCode::E, KeyCode::Up]) {
         for mut trans in cams.iter_mut() {
-            trans.translation.y -= dt;
+            trans.translation.y += 4.*dt;
             trans.look_at(Vec3::new(0., 0., -5.), Vec3::Y);
         }
     }
