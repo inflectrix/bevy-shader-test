@@ -2,8 +2,8 @@ mod custom_mat;
 
 use custom_mat::CustomMaterial;
 
-use bevy::{prelude::*, render::mesh::shape::{Cube, UVSphere}, core_pipeline::bloom::BloomSettings};
-use bevy_egui::{egui, EguiContexts, EguiPlugin};
+use bevy::{prelude::*, render::mesh::shape::{Cube, UVSphere, Torus}, core_pipeline::bloom::BloomSettings};
+use bevy_egui::{egui::{self, Ui}, EguiContexts, EguiPlugin};
 
 #[derive(Resource, Debug)]
 struct UIState {
@@ -134,9 +134,10 @@ fn handle_ui(
         egui::ComboBox::from_label("Model")
             .selected_text(format!("{}", ui_state.selected_model))
             .show_ui(ui, |ui| {
-                ui.selectable_value(&mut ui_state.selected_model, "Cube".to_string(), "Cube");
-                ui.selectable_value(&mut ui_state.selected_model, "Pyramid".to_string(), "Pyramid");
-                ui.selectable_value(&mut ui_state.selected_model, "Sphere".to_string(), "Sphere");
+                add_option(&mut ui_state, ui, "Cube");
+                add_option(&mut ui_state, ui, "Pyramid");
+                add_option(&mut ui_state, ui, "Sphere");
+                add_option(&mut ui_state, ui, "Torus");
             });
     });
 
@@ -155,17 +156,35 @@ fn handle_ui(
                     MaterialMeshBundle {
                         mesh: meshes.add(Mesh::from(UVSphere {
                             radius: 1.,
-                            sectors: 100,
-                            stacks: 100,
+                            sectors: 50,
+                            stacks: 50,
                         })),
                         ..gen_shaded_shape(&mut materials)
                     },
                     Spinny,
                 ));
             },
+            "Torus" => {
+                commands.spawn((
+                    MaterialMeshBundle {
+                        mesh: meshes.add(Mesh::from(Torus {
+                            radius: 1.,
+                            ring_radius: 0.5,
+                            subdivisions_segments: 50,
+                            subdivisions_sides: 50,
+                        })),
+                        ..gen_shaded_shape(&mut materials)
+                    },
+                    Spinny,
+                ));
+            }
             _ => panic!("invalid ui state: {:?}", ui_state),
         }
 
         ui_state.previous_model = ui_state.selected_model.clone();
     }
+}
+
+fn add_option(ui_state: &mut UIState, ui: &mut Ui, name: &str) {
+    ui.selectable_value(&mut ui_state.selected_model, name.to_string(), name);
 }
