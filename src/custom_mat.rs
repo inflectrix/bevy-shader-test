@@ -2,6 +2,7 @@ use bevy::{
     prelude::*,
     reflect::TypeUuid,
     render::render_resource::{AsBindGroup, ShaderRef},
+    math::Vec3,
 };
 
 #[repr(C)]
@@ -11,7 +12,8 @@ pub struct CustomMaterial {
     #[uniform(0)]
     pub time: f32,
 
-    pub _padding: [u32; 3], // 2*3 + 2 = 16
+    #[uniform(0)]
+    pub _padding: Vec3, // 2*3 + 2 = 16
 
     pub alpha_mode: AlphaMode,
 }
