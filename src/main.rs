@@ -21,6 +21,9 @@ impl Default for UIState {
 #[derive(Component)]
 struct Spinny;
 
+#[derive(Component)]
+struct CamControlled;
+
 fn main() {
     App::new()
         .add_plugins((
@@ -34,6 +37,7 @@ fn main() {
             spin, 
             change_color,
             handle_ui,
+            cam_controls,
         ))
         .run();
 }
@@ -61,6 +65,7 @@ fn setup(
             ..default()
         },
         BloomSettings::NATURAL,
+        CamControlled,
     ));
 
     // light
@@ -187,4 +192,26 @@ fn handle_ui(
 
 fn add_option(ui_state: &mut UIState, ui: &mut Ui, name: &str) {
     ui.selectable_value(&mut ui_state.selected_model, name.to_string(), name);
+}
+
+fn cam_controls(
+    time: Res<Time>,
+    mut cams: Query<&mut Transform, With<CamControlled>>,
+    keys: Res<Input<KeyCode>>,
+) {
+    let dt = time.delta_seconds();
+
+    if keys.pressed(KeyCode::Q) {
+        for mut trans in cams.iter_mut() {
+            trans.translation.y += dt;
+            trans.look_at(Vec3::new(0., 0., -5.), Vec3::Y);
+        }
+    }
+
+    if keys.pressed(KeyCode::E) {
+        for mut trans in cams.iter_mut() {
+            trans.translation.y -= dt;
+            trans.look_at(Vec3::new(0., 0., -5.), Vec3::Y);
+        }
+    }
 }
