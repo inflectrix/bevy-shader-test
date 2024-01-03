@@ -2,17 +2,19 @@ mod custom_mat;
 
 use custom_mat::CustomMaterial;
 
-use bevy::{prelude::*, render::mesh::shape::Cube};
+use bevy::{prelude::*, render::mesh::shape::Cube, core_pipeline::bloom::BloomSettings};
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
 
 #[derive(Resource)]
 struct UIState {
+    previous_model: String,
     selected_model: String,
 }
 
 impl Default for UIState {
     fn default() -> Self {
-        Self { selected_model: "Cube".to_string() }
+        let v = "Cube".to_string();
+        Self { previous_model: v.clone(), selected_model: v }
     }
 }
 
@@ -42,17 +44,24 @@ fn setup(
     mut materials: ResMut<Assets<CustomMaterial>>,
 ) {
     // camera
-    commands.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(0., 2., 0.).looking_at(
-            Vec3 {
-                x: 0.,
-                y: 0.,
-                z: -5.,
+    commands.spawn((
+        Camera3dBundle {
+            camera: Camera {
+                hdr: true,
+                ..default()
             },
-            Vec3::Y,
-        ),
-        ..default()
-    });
+            transform: Transform::from_xyz(0., 2., 0.).looking_at(
+                Vec3 {
+                    x: 0.,
+                    y: 0.,
+                    z: -5.,
+                },
+                Vec3::Y,
+            ),
+            ..default()
+        },
+        BloomSettings::NATURAL,
+    ));
 
     // light
     commands.spawn(PointLightBundle {
@@ -107,4 +116,8 @@ fn handle_ui(
                 ui.selectable_value(&mut ui_state.selected_model, "Sphere".to_string(), "Sphere");
             });
     });
+
+    // TODO detect model change and do stuff
+    
+    ui_state.previous_model = ui_state.selected_model.clone();
 }
