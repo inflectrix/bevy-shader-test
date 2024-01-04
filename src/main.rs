@@ -140,7 +140,6 @@ fn handle_ui(
             .selected_text(format!("{}", ui_state.selected_model))
             .show_ui(ui, |ui| {
                 add_option(&mut ui_state, ui, "Cube");
-                add_option(&mut ui_state, ui, "Pyramid");
                 add_option(&mut ui_state, ui, "Sphere");
                 add_option(&mut ui_state, ui, "Torus");
             });
@@ -153,9 +152,6 @@ fn handle_ui(
 
         match ui_state.selected_model.as_str() {
             "Cube" => spawn_cube(&mut commands, &mut materials, &mut meshes),
-            "Pyramid" => {
-                todo!();
-            },
             "Sphere" => {
                 commands.spawn((
                     MaterialMeshBundle {
