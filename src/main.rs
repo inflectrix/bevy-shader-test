@@ -130,6 +130,7 @@ fn handle_ui(
     mut materials: ResMut<Assets<CustomMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
     spinnies: Query<Entity, With<Spinny>>,
+    asset_server: Res<AssetServer>,
 
     // ui stuff
     mut contexts: EguiContexts,
@@ -142,8 +143,35 @@ fn handle_ui(
                 add_option(&mut ui_state, ui, "Cube");
                 add_option(&mut ui_state, ui, "Sphere");
                 add_option(&mut ui_state, ui, "Torus");
+                add_option(&mut ui_state, ui, "Custom");
             });
     });
+
+    if ui_state.selected_model.as_str() == "Custom" {
+        egui::Window::new("Import Custom Model").show(contexts.ctx_mut(), |ui| {
+            if ui.button("Import file").clicked() {
+                let data: Option<Vec<u8>> = async_std::task::block_on(async {
+                    let file = rfd::AsyncFileDialog::new()
+                        .set_title("Import model")
+                        .add_filter("model file", &["glb", "gltf"]) // TODO possibly more support for other file types
+                        .pick_file().await;
+
+                    Some(file?.read().await)
+                });
+
+                if data.is_none() {
+                    return;
+                }
+
+                for ent in spinnies.iter() {
+                    commands.entity(ent).despawn();
+                }
+                // TODO load model
+            }
+        });
+
+        return;
+    }
 
     if ui_state.previous_model != ui_state.selected_model {
         for ent in spinnies.iter() {
